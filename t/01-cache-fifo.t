@@ -57,6 +57,19 @@ subtest {
     ok $cache.put("key2", "value2");
     is-deeply $cache.keys, ["key1", "key2"];
 
-}, 'Test dupe key';
+}, 'Test put on dupe key';
+
+subtest {
+    my Cache::FIFO $cache .= new(2);
+
+    $cache.put("key1", "value1");
+
+    ok $cache.remove("key1");
+    ok !$cache.get("key1").defined;
+
+    ok !$cache.remove("key1"), "Remove item already removed";
+    is-deeply $cache.keys, [];
+
+}, 'Test remove';
 
 done-testing;

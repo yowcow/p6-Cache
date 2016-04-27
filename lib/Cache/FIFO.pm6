@@ -29,3 +29,13 @@ method put(Cache::FIFO:D: Cool:D $key, Cool:D $value --> Bool) {
 method get(Cache::FIFO:D: Cool:D $key --> Any) {
     %!data{$key};
 }
+
+method remove(Cache::FIFO:D: Cool:D $key --> Bool) {
+
+    return False if not %!data{$key}:exists;
+
+    %!data{$key}:delete;
+    @!keys.splice: @!keys.first($key, :k), 1;
+
+    True;
+}
