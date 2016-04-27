@@ -3,8 +3,8 @@ use v6;
 unit class Cache::FIFO;
 
 has Int $.max-length;
-has Any %.data;
-has Any @!keys;
+has %.data;
+has @.keys;
 
 method new(Int:D $max-length!) {
     self.bless(:$max-length);
@@ -16,10 +16,12 @@ submethod BUILD(Int:D :$!max-length) {
 }
 
 method put(Cache::FIFO:D: Cool:D $key, Cool:D $value --> Bool) {
-    %!data{@!keys.shift}:delete
-        if @!keys.elems >= $!max-length;
 
-    @!keys.push: $key;
+    if !(%!data{$key}:exists) {
+        %!data{@!keys.shift}:delete
+            if @!keys.elems >= $!max-length;
+        @!keys.push: $key;
+    }
 
     so %!data{$key} = $value;
 }

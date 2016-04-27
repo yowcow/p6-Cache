@@ -45,4 +45,18 @@ subtest {
 
 }, 'Test put exceeds max-length';
 
+subtest {
+    my Cache::FIFO $cache .= new(2);
+
+    ok $cache.put("key1", "value1");
+    ok $cache.put("key1", "value2");
+
+    is $cache.get("key1"), "value2";
+    is-deeply $cache.keys, ["key1"];
+
+    ok $cache.put("key2", "value2");
+    is-deeply $cache.keys, ["key1", "key2"];
+
+}, 'Test dupe key';
+
 done-testing;
