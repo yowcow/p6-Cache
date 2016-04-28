@@ -4,8 +4,8 @@ unit class Cache::FIFO;
 
 has Int $.max-length;
 has Any %.data;
-has Hash $.head;
-has Hash $.tail;
+has $.head;
+has $.tail;
 
 method new(Int:D $max-length!) {
     self.bless(:$max-length);
@@ -55,10 +55,19 @@ method remove(Cache::FIFO:D: Cool:D $key --> Bool) {
 
     my $node = %!data{$key};
 
-    $node.<_prev>.<_next> = $node.<_next>
-        if $node.<_next>.defined;
-    $node.<_next>.<_prev> = $node.<_prev>
-        if $node.<_prev>.defined;
+    if $!head.<key> ~~ $node.<key> {
+        $!head = $node.<_next>.defined ?? $node.<_next> !! Nil;
+    }
+    else {
+        $node.<_prev>.<_next> = $node.<_next>;
+    }
+
+    if $!tail.<key> ~~ $node.<key> {
+        $!tail = $node.<_prev>.defined ?? $node.<_prev> !! Nil;
+    }
+    else {
+        $node.<_next>.<_prev> = $node.<_prev>;
+    }
 
     so %!data{$key}:delete;
 }

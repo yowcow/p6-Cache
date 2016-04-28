@@ -60,12 +60,32 @@ subtest {
 }, 'Test put on dupe key';
 
 subtest {
-    my Cache::FIFO $cache .= new(2);
+    my Cache::FIFO $cache .= new(3);
 
     $cache.put("key1", "value1");
+    $cache.put("key2", "value2");
+    $cache.put("key3", "value3");
+
+    is $cache.head.<key>, "key1";
+    is $cache.tail.<key>, "key3";
+
+    ok $cache.remove("key2");
+    ok !$cache.get("key2").defined;
+
+    is $cache.head.<key>, "key1";
+    is $cache.tail.<key>, "key3";
 
     ok $cache.remove("key1");
     ok !$cache.get("key1").defined;
+
+    is $cache.head.<key>, "key3";
+    is $cache.tail.<key>, "key3";
+
+    ok $cache.remove("key3");
+    ok !$cache.get("key3").defined;
+
+    ok not $cache.head.defined;
+    ok not $cache.tail.defined;
 
     ok !$cache.remove("key1"), "Remove item already removed";
     is-deeply $cache.all-keys, ();
