@@ -52,10 +52,10 @@ subtest {
     ok $cache.put("key1", "value2");
 
     is $cache.get("key1"), "value2";
-    is-deeply $cache.keys, ["key1"];
+    is-deeply $cache.all-keys, ("key1",);
 
     ok $cache.put("key2", "value2");
-    is-deeply $cache.keys, ["key1", "key2"];
+    is-deeply $cache.all-keys, ("key1", "key2",);
 
 }, 'Test put on dupe key';
 
@@ -68,7 +68,7 @@ subtest {
     ok !$cache.get("key1").defined;
 
     ok !$cache.remove("key1"), "Remove item already removed";
-    is-deeply $cache.keys, [];
+    is-deeply $cache.all-keys, ();
 
 }, 'Test remove';
 
