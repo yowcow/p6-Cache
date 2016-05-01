@@ -1,14 +1,17 @@
 {
-  "name" : "Cache::FIFO",
+  "name" : "Cache",
   "source-url" : "git://github.com/yowcow/p6-Cache.git",
   "perl" : "6.c",
   "resources" : [ ],
   "build-depends" : [ ],
   "provides" : {
-    "Cache::FIFO" : "lib/Cache/FIFO.pm6"
+    "Cache" : "lib/Cache.pm6",
+    "Cache::FIFO" : "lib/Cache/FIFO.pm6",
+    "Cache::LRU" : "lib/Cache/LRU.pm6",
+    "Cache::Role::NodeManipulation" : "lib/Cache/Role/NodeManipulation.pm6"
   },
   "depends" : [ ],
-  "description" : "First-in-first-out caching",
+  "description" : "Caching algorithm in Perl 6",
   "test-depends" : [ ],
   "version" : "*",
   "authors" : [

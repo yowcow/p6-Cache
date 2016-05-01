@@ -1,13 +1,13 @@
 use v6;
 use Cache::Role::NodeManipulation;
 
-unit class Cache::FIFO does Cache::Role::NodeManipulation;
+unit class Cache::LRU does Cache::Role::NodeManipulation;
 
-has Int $.max-length;
-has Any %.data;
+has Int $.capacity;
+has %.data;
 
-method new(Int:D $max-length where { $max-length > 0 }) {
-    self.bless(:$max-length);
+method new(Int:D $capacity where { $capacity > 0 }) {
+    self.bless(:$capacity);
 }
 
 method put(::?CLASS:D: Cool:D $key, Any:D $value --> Bool) {
@@ -17,7 +17,7 @@ method put(::?CLASS:D: Cool:D $key, Any:D $value --> Bool) {
     }
     else {
         self.remove($!head.<key>)
-            if %!data.keys.elems >= $!max-length;
+            if %!data.keys.elems >= $!capacity;
 
         my $item = {
             key   => $key,
@@ -32,12 +32,15 @@ method put(::?CLASS:D: Cool:D $key, Any:D $value --> Bool) {
 }
 
 method get(::?CLASS:D: Cool:D $key --> Any) {
-    %!data{$key}.<value>;
+    if %!data{$key}:exists {
+        self.move-node-to-tail(%!data{$key});
+        %!data{$key}.<value>;
+    }
 }
 
 method remove(::?CLASS:D: Cool:D $key --> Bool) {
     self.remove-node(%!data{$key})
-        if %!data{$key}:exists;
+            if %!data{$key}:exists;
     so %!data{$key}:delete;
 }
 
@@ -45,20 +48,21 @@ method remove(::?CLASS:D: Cool:D $key --> Bool) {
 
 =head1 NAME
 
-Cache::FIFO - First-in-first-out caching
+Cache::LRU - "Least Recently Used" caching
 
 =head1 SYNOPSIS
 
-    use Cache::FIFO;
+    use Cache::LRU;
 
-    my Cache::FIFO $cache .= new(2); # Max capacity: 2
+    my Cache::LRU $cache .= new(2); # Max capacity: 2
 
     $cache.put("key1", "value1");   # Sets key1 => value1
     $cache.put("key2", "value2");   # Sets key2 => value2
-    $cache.put("key1", "value1-1"); # Updates key1 => value1-1
+
+    $cache.get("key1");             # value1
     $cache.put("key3", "value3");   # Expires key2, and sets key3 => value3
 
-    say $cache.get("key1");  # value1-1
+    say $cache.get("key1");  # value1
     say $cache.get("key2");  # Nil
     say $cache.get("key3");  # value3
 
@@ -69,13 +73,13 @@ Cache::FIFO - First-in-first-out caching
 =head1 DESCRIPTION
 
 Cache::FIFO stores key-value cache for up to specified capacity,
-while expiring oldest created or updated key when reaching max. capacity.
+while expiring least recently used key when reaching max. capacity.
 
 =head1 METHODS
 
 =head3 new(Int:D $capacity --> Cache::FIFO)
 
-Creates a Cache::FIFO instance with specified capacity.
+Creates a Cache::LRU instance with specified capacity.
 
 =head3 put(::?CLASS:D: Cool:D $key, Any:D $value --> Bool)
 
