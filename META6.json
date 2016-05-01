@@ -1,0 +1,17 @@
+{
+  "name" : "Cache::FIFO",
+  "source-url" : "git://github.com/yowcow/p6-Cache.git",
+  "perl" : "6.c",
+  "resources" : [ ],
+  "build-depends" : [ ],
+  "provides" : {
+    "Cache::FIFO" : "lib/Cache/FIFO.pm6"
+  },
+  "depends" : [ ],
+  "description" : "First-in-first-out caching",
+  "test-depends" : [ ],
+  "version" : "*",
+  "authors" : [
+    "yowcow"
+  ]
+}
