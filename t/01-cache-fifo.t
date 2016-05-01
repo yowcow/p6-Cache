@@ -30,18 +30,35 @@ subtest {
     ok $cache.put("key2", "value2");
     is $cache.get("key2"), "value2";
 
-}, 'Test put-get';
+}, 'Test simple put-get';
 
 subtest {
-    my Cache::FIFO $cache .= new(2);
 
-    $cache.put("key1", "value1");
-    $cache.put("key2", "value2");
-    $cache.put("key3", "value3");
+    subtest {
+        my Cache::FIFO $cache .= new(2);
 
-    is $cache.get("key1").defined, False;
-    is $cache.get("key2"), "value2";
-    is $cache.get("key3"), "value3";
+        $cache.put("key1", "value1");
+        $cache.put("key2", "value2");
+        $cache.put("key3", "value3");
+
+        is $cache.get("key1").defined, False;
+        is $cache.get("key2"), "value2";
+        is $cache.get("key3"), "value3";
+
+    }, 'Oldest key expires';
+
+    subtest {
+        my Cache::FIFO $cache .= new(2);
+
+        $cache.put("key1", "value1");
+        $cache.put("key2", "value2");
+        $cache.put("key1", "value11");
+        $cache.put("key3", "value3");
+
+        is $cache.get("key1"), "value11";
+        is $cache.get("key2").defined, False;
+
+    }, 'Updated key does not expire';
 
 }, 'Test put exceeds max-length';
 
@@ -88,6 +105,7 @@ subtest {
     ok not $cache.tail.defined;
 
     ok !$cache.remove("key1"), "Remove item already removed";
+
     is-deeply $cache.all-keys, ();
 
 }, 'Test remove';
