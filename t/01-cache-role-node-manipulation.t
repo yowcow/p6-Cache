@@ -40,6 +40,33 @@ subtest {
 }, 'Test all-node-keys';
 
 subtest {
+    my MyNode $n .= new;
+
+    subtest {
+        my $item = { key => 'node1' };
+
+        $n.append-node($($item));
+
+        is $n.head.<key>, 'node1';
+        is $n.tail.<key>, 'node1';
+        is-deeply $n.all-node-keys, [< node1 >];
+
+    }, 'Set head and tail if list is empty';
+
+    subtest {
+        my $item = { key => 'node2' };
+
+        $n.append-node($($item));
+
+        is $n.head.<key>, 'node1';
+        is $n.tail.<key>, 'node2';
+        is-deeply $n.all-node-keys, [< node1 node2 >];
+
+    }, 'Append to the list';
+
+}, 'Test append-node';
+
+subtest {
 
     subtest {
         my $node3 = {

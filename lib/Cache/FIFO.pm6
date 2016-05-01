@@ -32,14 +32,7 @@ method put(::?CLASS:D: Cool:D $key, Cool:D $value --> Bool) {
             _next => Nil,
         };
 
-        if $!tail.defined {
-            $!tail.<_next> = $($item);
-            $item.<_prev>  = $($!tail);
-        }
-
-        $!tail = $($item);
-        $!head = $($item)
-            if not $!head.defined;
+        self.append-node($($item));
 
         so %!data{$key} = $($item);
     }

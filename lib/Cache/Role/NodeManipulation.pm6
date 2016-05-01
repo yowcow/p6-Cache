@@ -20,6 +20,23 @@ method all-node-keys(::?CLASS:D: --> Array) {
     @keys;
 }
 
+method append-node(::?CLASS:D: Hash $node --> Bool) {
+
+    # Exchange tail pointers
+    if $!tail.defined {
+        $!tail.<_next> = $node;
+        $node.<_prev> = $!tail;
+    }
+
+    # Given node is the tail!
+    $!tail = $node;
+
+    # If no head is defined, this node is the head
+    $!head = $node if not $!head.defined;
+
+    True;
+}
+
 method move-node-to-tail(::?CLASS:D: Hash $node --> Bool) {
 
     # Do nothing if current node is the tail
@@ -54,3 +71,49 @@ method remove-node(::?CLASS:D: Hash $node --> Bool) {
 
     True;
 }
+
+=begin pod
+
+=head1 NAME
+
+Cache::Role::NodeManipulation - Manipulate cached nodes
+
+=head1 SYNOPSIS
+
+    use Cache::Role::NodeManipulation;
+
+    class MyCache does Cache::Role::NodeManipulation {}
+
+=head1 DESCRIPTION
+
+Cache::Role::NodeManipulation manages nodes in cache instance.
+
+=head1 METHODS
+
+=head3 all-node-keys(::?CLASS:D: --> Array)
+
+Returns an array of "keys" in the node list.
+
+=head3 append-node(::?CLASS:D: Hash $node --> Bool)
+
+Appends given node to tail of the node list.
+
+=head3 move-node-to-tail(::?CLASS:D: Hash $node --> Bool)
+
+Moves given node to tail of the node list.
+
+=head3 remove-node(::?CLASS:D: Hash $node --> Bool)
+
+Removes given node from the node list.
+
+=head1 AUTHOR
+
+yowcow <yowcow@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2016 yowcow
+
+This library is free software; you can redistribute it and/or modify it under the Artistic License 2.0.
+
+=end pod
