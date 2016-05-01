@@ -30,6 +30,8 @@ subtest {
     ok $cache.put("key2", "value2");
     is $cache.get("key2"), "value2";
 
+    is-deeply $cache.all-node-keys, ["key1", "key2"];
+
 }, 'Test simple put-get';
 
 subtest {
@@ -45,6 +47,8 @@ subtest {
         is $cache.get("key2"), "value2";
         is $cache.get("key3"), "value3";
 
+        is-deeply $cache.all-node-keys, ["key2", "key3"];
+
     }, 'Oldest key expires';
 
     subtest {
@@ -58,6 +62,8 @@ subtest {
         is $cache.get("key1"), "value11";
         is $cache.get("key2").defined, False;
 
+        is-deeply $cache.all-node-keys, ["key1", "key3"];
+
     }, 'Updated key does not expire';
 
 }, 'Test put exceeds max-length';
@@ -69,10 +75,10 @@ subtest {
     ok $cache.put("key1", "value2");
 
     is $cache.get("key1"), "value2";
-    is-deeply $cache.all-keys, ("key1",);
+    is-deeply $cache.all-node-keys, ["key1",];
 
     ok $cache.put("key2", "value2");
-    is-deeply $cache.all-keys, ("key1", "key2",);
+    is-deeply $cache.all-node-keys, ["key1", "key2",];
 
 }, 'Test put on dupe key';
 
@@ -85,28 +91,30 @@ subtest {
 
     is $cache.head.<key>, "key1";
     is $cache.tail.<key>, "key3";
+    is-deeply $cache.all-node-keys, ["key1", "key2", "key3"];
 
     ok $cache.remove("key2");
-    ok !$cache.get("key2").defined;
+    ok not $cache.get("key2").defined;
 
     is $cache.head.<key>, "key1";
     is $cache.tail.<key>, "key3";
+    is-deeply $cache.all-node-keys, ["key1", "key3"];
 
     ok $cache.remove("key1");
-    ok !$cache.get("key1").defined;
+    ok not $cache.get("key1").defined;
 
     is $cache.head.<key>, "key3";
     is $cache.tail.<key>, "key3";
+    is-deeply $cache.all-node-keys, ["key3"];
 
     ok $cache.remove("key3");
-    ok !$cache.get("key3").defined;
+    ok not $cache.get("key3").defined;
 
     ok not $cache.head.defined;
     ok not $cache.tail.defined;
+    is-deeply $cache.all-node-keys, [];
 
-    ok !$cache.remove("key1"), "Remove item already removed";
-
-    is-deeply $cache.all-keys, ();
+    ok not $cache.remove("key1"), "Remove item already removed";
 
 }, 'Test remove';
 
